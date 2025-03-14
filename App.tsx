@@ -5,6 +5,7 @@ import { User } from './src/types';
 import UserItem from './src/components/UserItem';
 import UserListHeader from './src/components/UserListHeader';
 import UserModal from './src/components/UserModal';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const App: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -13,12 +14,10 @@ const App: React.FC = () => {
   const [editableUser, setEditableUser] = useState<User | null>(null);
   const [form, setForm] = useState<User>({ name: '', email: '', password: '' });
 
-  // Load users when the application mounts
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // Fetch list of users from the API
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -32,7 +31,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Confirm deletion then delete user
   const handleDelete = (userId: number) => {
     Alert.alert('Confirm Delete', 'Are you sure you want to delete this user?', [
       { text: 'Cancel', style: 'cancel' },
@@ -53,21 +51,18 @@ const App: React.FC = () => {
     }
   };
 
-  // Open modal with user data for editing
   const openModalForEdit = (user: User) => {
     setEditableUser(user);
     setForm(user);
     setModalVisible(true);
   };
 
-  // Open modal for adding a new user
   const openModalForAdd = () => {
     setEditableUser(null);
     setForm({ name: '', email: '', password: '' });
     setModalVisible(true);
   };
 
-  // Handle save action for adding or updating a user
   const handleSave = () => {
     if (!form.name || !form.email || !form.password) {
       Alert.alert('Validation', 'Please fill all fields.');
@@ -83,7 +78,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Update existing user in the backend
   const updateUser = async () => {
     setLoading(true);
     try {
@@ -103,7 +97,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Add a new user to the backend
   const addUser = async () => {
     setLoading(true);
     try {
@@ -123,38 +116,38 @@ const App: React.FC = () => {
     }
   };
 
-  // Update form state based on user input
   const handleChange = (field: keyof User, value: string) => {
     setForm({ ...form, [field]: value });
   };
 
-  // Render individual user item using the UserItem component
   const renderUserItem = ({ item }: { item: User }) => (
     <UserItem item={item} onEdit={openModalForEdit} onDelete={handleDelete} />
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={users}
-        keyExtractor={(item, index) =>
-          item.id ? item.id.toString() : index.toString()
-        }
-        renderItem={renderUserItem}
-        ListHeaderComponent={
-          <UserListHeader loading={loading} onAdd={openModalForAdd} />
-        }
-        contentContainerStyle={styles.listContent}
-      />
-      <UserModal
-        visible={modalVisible}
-        form={form}
-        isEdit={!!editableUser}
-        onClose={() => setModalVisible(false)}
-        onChange={handleChange}
-        onSave={handleSave}
-      />
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={users}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : index.toString()
+          }
+          renderItem={renderUserItem}
+          ListHeaderComponent={
+            <UserListHeader loading={loading} onAdd={openModalForAdd} onRefresh={fetchUsers} />
+          }
+          contentContainerStyle={styles.listContent}
+        />
+        <UserModal
+          visible={modalVisible}
+          form={form}
+          isEdit={!!editableUser}
+          onClose={() => setModalVisible(false)}
+          onChange={handleChange}
+          onSave={handleSave}
+        />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 
