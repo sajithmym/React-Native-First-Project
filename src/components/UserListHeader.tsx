@@ -12,7 +12,7 @@ const UserListHeader: React.FC<UserListHeaderProps> = ({ loading, onAdd, onRefre
   return (
     <Animated.View entering={SlideInDown} exiting={SlideOutUp} style={styles.headerContainer}>
       <View style={styles.headerTop}>
-        <Text style={styles.header}>User Management</Text>
+        <Text style={styles.header}>Saj Management</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
           <Text style={styles.refreshText}>Refresh</Text>
         </TouchableOpacity>
